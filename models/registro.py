@@ -1,28 +1,55 @@
+import sqlite3
 from datetime import datetime
 
-class Regitro():
-    def __init__(self, auto, tarifa, hora_entrada, hora_salida=None):
-        self.auto = auto
-        tarifa = tarifa
-        hora_entrada = hora_entrada
+class Registro:
+    def __init__(self, patente, hora_entrada, hora_salida=None, total=None):
+        self.patente = patente
+        self.hora_entrada = hora_entrada
         self.hora_salida = hora_salida
-        self.estado = "En el lugar" if hora_salida is None else "Retirado"
-        self.total = 0
+        self.total = total
+
+    def guardar(self):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS registros (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                patente TEXT,
+                hora_entrada TEXT,
+                hora_salida TEXT,
+                total REAL,
+                FOREIGN KEY (patente) REFERENCES autos (patente)
+            )
+        """)
+
+        cursor.execute("""
+            INSERT INTO registros (patente, hora_entrada, hora_salida, total)
+            VALUES (?, ?, ?, ?)
+        """, (self.patente, self.hora_entrada, self.hora_salida, self.total))
         
-    def calcular_total(self):
-        if self.hora_salida is None:
-            return 0
-        #Calcular el tiempo que estuvo estacionado
-        tiempo_estacionado = self.hora_salida - self.hora_entrada
-        horas_estacionadas = tiempo_estacionado.total_seconds() / 3600 #convierte a horas
-        self.total = horas_estacionadas * self.tarifa.tarifa_por_hora
-        
+        conn.commit()
+        conn.close()
+
+    @classmethod
+    def obtener_registro(cls, id_registro):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT * FROM registros WHERE id = ?
+        """, (id_registro,))
+        result = cursor.fetchone()
+        conn.close()
+
+        if result:
+            return cls(patente=result[1], hora_entrada=result[2], hora_salida=result[3], total=result[4])
+        return None
+
+    def calcular_total(self, tarifa_por_hora):
+        if self.hora_salida:
+            entrada = datetime.strptime(self.hora_entrada, '%Y-%m-%d %H:%M:%S')
+            salida = datetime.strptime(self.hora_salida, '%Y-%m-%d %H:%M:%S')
+            tiempo_estacionado = (salida - entrada).total_seconds() / 3600  # Convertir a horas
+            self.total = tiempo_estacionado * tarifa_por_hora
         return self.total
-    
-    def actualizar_salida(self, hora_salida):
-        self.hora_salida = hora_salida
-        self.estado = "Retirado"
-        self.calcular_total()
-        
-    
-        
