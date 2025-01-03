@@ -3,7 +3,7 @@ from .registro_view import DataTable
 from .ingreso_view import Entrada_view
 from .salida_view import Salida_view
 
-def Tabs_view():    
+def Tabs_view(page:ft.Page):    
     return ft.Tabs(
         selected_index=1,
         animation_duration=300,
@@ -11,12 +11,12 @@ def Tabs_view():
             ft.Tab(
                 text="Registro",
                 icon=ft.Icons.CARD_MEMBERSHIP,
-                content=DataTable(),
+                content=DataTable(page),
             ),
             ft.Tab(
                 text="Ingreso",
                 icon=ft.Icons.CAR_RENTAL,
-                content=Entrada_view(),
+                content=Entrada_view(page),
             ),
             ft.Tab(
                 text="Salida",
