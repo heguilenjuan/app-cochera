@@ -1,6 +1,7 @@
 import flet as ft
 from .registro_view import DataTable
-
+from .ingreso_view import Entrada_view
+from .salida_view import Salida_view
 
 def Tabs_view():    
     return ft.Tabs(
@@ -15,12 +16,12 @@ def Tabs_view():
             ft.Tab(
                 text="Ingreso",
                 icon=ft.Icons.CAR_RENTAL,
-                content=ft.Text("Esta es la pestaña Ingreso")
+                content=Entrada_view(),
             ),
             ft.Tab(
                 text="Salida",
                 icon=ft.Icons.EXIT_TO_APP,
-                content=ft.Text("Esta es la pestaña Salida")
+                content=Salida_view()
             )
         ],
         expand=1
