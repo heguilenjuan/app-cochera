@@ -7,13 +7,11 @@ class Registro:
         self.hora_entrada = hora_entrada
         self.hora_salida = hora_salida
         self.total = total
-        
-        
 
-    def guardar(self):
+    def crear_tabla_registros():
         conn = sqlite3.connect('cochera.db')
         cursor = conn.cursor()
-
+        
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS registros (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,6 +22,13 @@ class Registro:
                 FOREIGN KEY (patente) REFERENCES autos (patente)
             )
         """)
+        conn.commit()
+        conn.close()
+
+    def guardar(self):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+
 
         cursor.execute("""
             INSERT INTO registros (patente, hora_entrada, hora_salida, total)
@@ -81,4 +86,3 @@ class Registro:
         
         conn.commit()  # Guardar los cambios en la base de datos
         conn.close()
-

@@ -1,8 +1,17 @@
 import flet as ft
 from database import insertar_auto, insertar_registro
+from models.tarifas import Tarifa
 
-def Entrada_view(page: ft.Page):
-
+def Entrada_view(page: ft.Page, app_state):
+    tarifas = Tarifa.obtener_todas()
+    
+    # Crear las opciones para el Dropdown
+    dropdown_options = [
+        ft.dropdown.Option(tarifa.tipo) for tarifa in tarifas
+    ] if tarifas else []
+     # Establecer un valor predeterminado si hay opciones
+    default_value = tarifas[0].tipo if tarifas else None
+    
     def button_click(e):
         patente_val = patente.value
         tipo_val = tipo.value
@@ -28,7 +37,7 @@ def Entrada_view(page: ft.Page):
     
     # Campos y botón
     patente = ft.TextField(label="Patente", width=300, bgcolor="white", color="black")
-    tipo = ft.TextField(label="Tipo", width=300, bgcolor="white", color="black")
+    tipo = ft.Dropdown(bgcolor="white", color="black", options=dropdown_options,value=default_value, width=300)
     b = ft.ElevatedButton(text="Ingresar", on_click=button_click, width=150, bgcolor="white", color="black")
 
     # Retornando el formulario en un contenedor
