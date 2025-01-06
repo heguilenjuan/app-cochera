@@ -7,6 +7,8 @@ class Registro:
         self.hora_entrada = hora_entrada
         self.hora_salida = hora_salida
         self.total = total
+        
+        
 
     def guardar(self):
         conn = sqlite3.connect('cochera.db')
@@ -30,6 +32,14 @@ class Registro:
 
         conn.commit()
         conn.close()
+    
+    def calcular_total(self, tarifa_por_hora):
+        if self.hora_salida:
+            entrada = datetime.strptime(self.hora_entrada, '%Y-%m-%d %H:%M:%S')
+            salida = datetime.strptime(self.hora_salida, '%Y-%m-%d %H:%M:%S')
+            tiempo_estacionado = (salida - entrada).total_seconds() / 3600  # Convertir a horas
+            self.total = tiempo_estacionado * tarifa_por_hora
+        return self.total
 
     @classmethod
     def obtener_registro(cls, id_registro):
@@ -60,10 +70,15 @@ class Registro:
         # Devolver una lista de objetos Registro
         return [cls(patente=r[1], hora_entrada=r[2], hora_salida=r[3], total=r[4]) for r in registros]
 
-    def calcular_total(self, tarifa_por_hora):
-        if self.hora_salida:
-            entrada = datetime.strptime(self.hora_entrada, '%Y-%m-%d %H:%M:%S')
-            salida = datetime.strptime(self.hora_salida, '%Y-%m-%d %H:%M:%S')
-            tiempo_estacionado = (salida - entrada).total_seconds() / 3600  # Convertir a horas
-            self.total = tiempo_estacionado * tarifa_por_hora
-        return self.total
+    def eliminar(id_registro):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+        
+        # Eliminar el registro con el ID especificado
+        cursor.execute("""
+            DELETE FROM registros WHERE id = ?
+        """, (id_registro,))
+        
+        conn.commit()  # Guardar los cambios en la base de datos
+        conn.close()
+

@@ -12,7 +12,8 @@ class Auto:
         # Corregir el error en la definición de la tabla
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS autos (
-                patente TEXT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                patente TEXT,
                 tipo TEXT
             )
         """)
@@ -40,3 +41,14 @@ class Auto:
         if result:
             return cls(patente=result[0], tipo=result[1])
         return None
+    
+    def eliminar_auto(id_auto):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            DELETE FROM autos WHERE id = ?
+        """, (id_auto))
+
+        conn.commit()
+        conn.close()

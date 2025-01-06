@@ -37,3 +37,44 @@ class Tarifa:
         if result:
             return cls(tarifa_por_hora=result[0])
         return None
+    @classmethod
+    def obtener_todas(cls):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT * FROM tarifas
+        """)
+        
+        resultados = cursor.fetchall()
+        conn.close()
+        
+        #devolver una lista de objetos Tarifa
+        return[cls(id=row[0], tarifas_por_hora=row[1]) for row in resultados]
+    
+    @classmethod
+    def actualizar(cls, id_tarifa, nueva_tarifa):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE tarifas
+            SET tarifas_por_hora = ?
+            WHERE id = ?
+        """,(nueva_tarifa, id_tarifa))
+        
+        conn.commit()
+        conn.close()
+        
+    @classmethod
+    def eliminar(cls, id_tarifa):
+        conn = sqlite3.connect('cochera.db')
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            DELETE FROM tarifas WHERE id = ?
+        """, (id_tarifa))
+        
+        conn.commit()
+        conn.close()
+        
